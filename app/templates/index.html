@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Platform Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .auth-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .auth-section input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+        }
+        .auth-section button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .auth-section button:hover {
+            background: #5568d3;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-tab {
+            padding: 12px 25px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .nav-tab:hover {
+            transform: translateY(-2px);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .chart-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .progress-list {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .progress-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .progress-item:last-child {
+            border-bottom: none;
+        }
+        .progress-info {
+            flex: 1;
+        }
+        .progress-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        .collaboration-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .collaboration-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .session-list {
+            display: grid;
+            gap: 15px;
+        }
+        .session-card {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .session-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .session-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .session-card button {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .upload-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .upload-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            background: #f8f9fa;
+        }
+        .upload-area input {
+            display: none;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .file-item span {
+            flex: 1;
+            color: #333;
+        }
+        .hidden {
+            display: none;
+        }
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background: #fee;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Learning Platform Dashboard</h1>
+            <div id="auth-section" class="auth-section">
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+                <select id="role">
+                    <option value="student">Student</option>
+                    <option value="mentor">Mentor</option>
+                </select>
+                <button onclick="register()">Register</button>
+                <button onclick="login()">Login</button>
+                <button onclick="logout()" class="hidden" id="logout-btn">Logout</button>
+            </div>
+            <div id="user-info" class="hidden">
+                <p>Welcome, <span id="user-email"></span> (<span id="user-role"></span>)</p>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+            <button class="nav-tab" onclick="showTab('collaboration')">Collaboration</button>
+            <button class="nav-tab" onclick="showTab('content')">Content Ingestion</button>
+        </div>
+
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Courses</h3>
+                    <div class="value" id="total-courses">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Completed Lessons</h3>
+                    <div class="value" id="completed-lessons">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Lessons</h3>
+                    <div class="value" id="total-lessons">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Time Spent (minutes)</h3>
+                    <div class="value" id="time-spent">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Completion %</h3>
+                    <div class="value" id="completion-percentage">-</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Learning Activity (Last 30 Days)</h3>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Course Progress Distribution</h3>
+                    <canvas id="progress-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="progress-list">
+                <h3>Course Progress</h3>
+                <div id="course-progress-list"></div>
+            </div>
+        </div>
+
+        <div id="collaboration-tab" class="tab-content">
+            <div class="collaboration-section">
+                <h3>Create New Session</h3>
+                <input type="text" id="session-name" placeholder="Session Name" style="padding: 10px; width: 300px; margin-right: 10px;">
+                <input type="text" id="session-description" placeholder="Description" style="padding: 10px; width: 400px; margin-right: 10px;">
+                <button onclick="createSession()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Create Session</button>
+            </div>
+            <div class="collaboration-section">
+                <h3>Active Sessions</h3>
+                <div id="session-list" class="session-list"></div>
+            </div>
+        </div>
+
+        <div id="content-tab" class="tab-content">
+            <div class="upload-section">
+                <h3>Upload Learning Content</h3>
+                <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                    <p>Click to upload or drag and drop files here</p>
+                    <p style="color: #999; font-size: 14px; margin-top: 10px;">Supports PDF, DOCX, TXT, Video, Audio</p>
+                    <input type="file" id="file-input" onchange="uploadFile(event)">
+                </div>
+                <div id="file-list" class="file-list"></div>
+            </div>
+            <div class="upload-section" style="margin-top: 20px;">
+                <h3>Generated Flashcards</h3>
+                <div id="flashcard-list" class="file-list"></div>
+                <button onclick="exportFlashcards('json')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">Export JSON</button>
+                <button onclick="exportFlashcards('csv')" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px;">Export CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        let activityChart = null;
+        let progressChart = null;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard' && token) {
+                loadDashboard();
+            } else if (tabName === 'collaboration' && token) {
+                loadSessions();
+            } else if (tabName === 'content' && token) {
+                loadFiles();
+                loadFlashcards();
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            const response = await fetch('/api/auth/register/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, role })
+            });
+
+            if (response.ok) {
+                alert('Registration successful! Please login.');
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Registration failed');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/api/auth/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: email, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                token = data.token;
+                localStorage.setItem('token', token);
+                updateAuthUI();
+                loadDashboard();
+            } else {
+                alert('Login failed');
+            }
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem('token');
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            if (token) {
+                document.getElementById('auth-section').querySelectorAll('input, select, button').forEach(el => {
+                    if (el.id !== 'logout-btn') el.classList.add('hidden');
+                });
+                document.getElementById('logout-btn').classList.remove('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-email').textContent = document.getElementById('email').value;
+                document.getElementById('user-role').textContent = document.getElementById('role').value;
+            } else {
+                document.getElementById('auth-section').querySelectorAll('input, select, button').forEach(el => {
+                    el.classList.remove('hidden');
+                });
+                document.getElementById('logout-btn').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+            }
+        }
+
+        async function loadDashboard() {
+            const response = await fetch('/api/dashboard/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('total-courses').textContent = data.total_courses;
+                document.getElementById('completed-lessons').textContent = data.completed_lessons;
+                document.getElementById('total-lessons').textContent = data.total_lessons;
+                document.getElementById('time-spent').textContent = data.total_time_spent;
+                document.getElementById('completion-percentage').textContent = data.completion_percentage + '%';
+            }
+
+            loadTimeSeries();
+            loadCourseProgress();
+        }
+
+        async function loadTimeSeries() {
+            const response = await fetch('/api/timeseries/?days=30', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const labels = data.map(d => d.date);
+                const lessonsCompleted = data.map(d => d.lessons_completed);
+                const timeSpent = data.map(d => d.time_spent_minutes);
+
+                if (activityChart) activityChart.destroy();
+                
+                const ctx = document.getElementById('activity-chart').getContext('2d');
+                activityChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Lessons Completed',
+                            data: lessonsCompleted,
+                            borderColor: '#667eea',
+                            tension: 0.1
+                        }, {
+                            label: 'Time Spent (minutes)',
+                            data: timeSpent,
+                            borderColor: '#764ba2',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function loadCourseProgress() {
+            const response = await fetch('/api/course-progress/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const container = document.getElementById('course-progress-list');
+                container.innerHTML = '';
+
+                data.forEach(course => {
+                    const div = document.createElement('div');
+                    div.className = 'progress-item';
+                    div.innerHTML = `
+                        <div class="progress-info">
+                            <h4>${course.course_title}</h4>
+                            <p>${course.completed_lessons}/${course.total_lessons} lessons • ${course.time_spent_minutes} minutes</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${course.progress_percentage}%"></div>
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; color: #667eea;">${course.progress_percentage}%</div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                // Update pie chart
+                if (progressChart) progressChart.destroy();
+                
+                const ctx = document.getElementById('progress-chart').getContext('2d');
+                progressChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(c => c.course_title),
+                        datasets: [{
+                            data: data.map(c => c.progress_percentage),
+                            backgroundColor: [
+                                '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+        }
+
+        async function createSession() {
+            const name = document.getElementById('session-name').value;
+            const description = document.getElementById('session-description').value;
+
+            const response = await fetch('/api/collaboration-sessions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}`
+                },
+                body: JSON.stringify({ name, description })
+            });
+
+            if (response.ok) {
+                alert('Session created!');
+                loadSessions();
+            } else {
+                alert('Failed to create session');
+            }
+        }
+
+        async function loadSessions() {
+            const response = await fetch('/api/collaboration-sessions/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const container = document.getElementById('session-list');
+                container.innerHTML = '';
+
+                data.results.forEach(session => {
+                    const div = document.createElement('div');
+                    div.className = 'session-card';
+                    div.innerHTML = `
+                        <h4>${session.name}</h4>
+                        <p>${session.description || 'No description'}</p>
+                        <p>Participants: ${session.participant_count} | Active: ${session.is_active ? 'Yes' : 'No'}</p>
+                        <button onclick="joinSession(${session.id})">Join</button>
+                        <button onclick="leaveSession(${session.id})">Leave</button>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        async function joinSession(id) {
+            const response = await fetch(`/api/collaboration-sessions/${id}/join/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                alert('Joined session!');
+            }
+        }
+
+        async function leaveSession(id) {
+            const response = await fetch(`/api/collaboration-sessions/${id}/leave/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                alert('Left session!');
+            }
+        }
+
+        async function uploadFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('file_type', getFileType(file.name));
+
+            const response = await fetch('/api/uploaded-files/', {
+                method: 'POST',
+                headers: { 'Authorization': `Token ${token}` },
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('File uploaded successfully!');
+                loadFiles();
+            } else {
+                alert('Failed to upload file');
+            }
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const types = {
+                'pdf': 'pdf',
+                'docx': 'docx',
+                'doc': 'docx',
+                'txt': 'txt',
+                'mp4': 'video',
+                'mov': 'video',
+                'mp3': 'audio',
+                'wav': 'audio'
+            };
+            return types[ext] || 'other';
+        }
+
+        async function loadFiles() {
+            const response = await fetch('/api/uploaded-files/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const container = document.getElementById('file-list');
+                container.innerHTML = '';
+
+                data.results.forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `
+                        <span>${file.original_filename} (${file.file_type}) - ${file.processed ? 'Processed' : 'Pending'}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        async function loadFlashcards() {
+            const response = await fetch('/api/flashcards/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const container = document.getElementById('flashcard-list');
+                container.innerHTML = '';
+
+                data.results.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `
+                        <div>
+                            <strong>Q:</strong> ${card.front}<br>
+                            <strong>A:</strong> ${card.back}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        async function exportFlashcards(format) {
+            const url = format === 'json' ? '/api/flashcards/export_json/' : '/api/flashcards/export_csv/';
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url2 = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url2;
+                a.download = `flashcards.${format}`;
+                a.click();
+            }
+        }
+
+        // Initialize
+        if (token) {
+            updateAuthUI();
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>
